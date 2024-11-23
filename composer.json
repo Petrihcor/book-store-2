@@ -1,0 +1,22 @@
+{
+  "name": "vendor_name/online-diary",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Denis",
+      "email": "email@example.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/",
+      "Kernel\\": "kernel/"
+    }
+  },
+  "require": {
+    "php": "^8.2"
+  }
+
+}
