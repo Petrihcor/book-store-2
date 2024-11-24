@@ -16,7 +16,9 @@
     }
   },
   "require": {
-    "php": "^8.2"
+    "php": "^8.2",
+    "symfony/routing": "^7.1",
+    "symfony/http-foundation": "^7.1"
   }
 
 }

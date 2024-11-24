@@ -2,10 +2,13 @@
 
 namespace Kernel;
 
+use Kernel\Routs\Router;
+
 class App
 {
     public function run()
     {
-        echo "Hello world!";
+        $routs = new Router();
+        $routs->dispatch();
     }
 }
