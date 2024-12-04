@@ -21,9 +21,15 @@ class Router
 
     public Array $arrayRoutes;
 
+    public function __construct(
+        public string $path
+    )
+    {
+    }
+
 
     public function getArrayRoutes() {
-        $this->arrayRoutes = require __DIR__ . "/../../config/routes.php";
+        $this->arrayRoutes = require __DIR__ . "/../../$this->path";
         return $this->arrayRoutes;
     }
 
@@ -59,20 +65,28 @@ class Router
             if (is_array($controller)) {
                 [$class, $method] = $controller;
                 $instance = new $class();
-                $response = $instance->$method();
+                if (method_exists($instance, $method)) {
+                    $response = $instance->$method($request);
+                } else {
+                    throw new \Exception("Method $method does not exist in $class");
+                }
+                if ($response instanceof Response) {
+                    $response->send();
+                } else {
+                    echo $response;
+                }
             } else {
                 throw new \Exception('Invalid controller');
             }
         } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $e) {
             $response = new Response('<h1>404 Not Found</h1>', 404);
             $response->send();
-        } catch (\Exception $e) {
-            $response = new Response('<h1>An error occurred</h1>', 500);
-            $response->send();
         }
+//      catch (\Exception $e) {
+//            $response = new Response('<h1>An error occurred</h1>', 500);
+//            $response->send();
+//        }
 
     }
-
-
 
 }
