@@ -3,17 +3,18 @@
 namespace Kernel\Controller;
 use Kernel\Database\Database;
 use Kernel\Http\Request;
+use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\Forms;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormFactoryBuilder;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Bridge\Twig\Form\TwigRendererEngine;
-use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\Loader\ArrayLoader;
-
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Validator\Validation;
 abstract  class Controller
 {
 
@@ -39,33 +40,57 @@ abstract  class Controller
         return $this->database = new Database($config);
     }
 
-
-    protected function initTwig(string $name, array|null $data = null): string
+    private function getEnvironment()
     {
         $this->loader = new FilesystemLoader([
             __DIR__ . '/../../views',
             __DIR__ . '/../../vendor/symfony/twig-bridge/Resources/views/Form'
         ]);
         $this->twig = new Environment($this->loader);
+    }
 
-        // Добавляем переводчик
-        $translator = new Translator('en');
-        $translator->addLoader('array', new ArrayLoader());
+    protected function initTwig(string $name, array|null $data = null): string
+    {
+        $this->getEnvironment();
 
-        // Добавляем расширение перевода
-        $this->twig->addExtension(new TranslationExtension($translator));
 
         if (isset($data['form'])) {
-            // Настройка Form Extension
+            // the Twig file that holds all the default markup for rendering forms
+// this file comes with TwigBridge
             $defaultFormTheme = 'form_div_layout.html.twig';
-            $formEngine = new TwigRendererEngine([$defaultFormTheme], $this->twig);
-            $formRenderer = new FormRenderer($formEngine);
 
-            $this->twig->addExtension(new FormExtension());
-            $this->twig->addRuntimeLoader(new \Twig\RuntimeLoader\FactoryRuntimeLoader([
-                FormRenderer::class => fn() => $formRenderer,
+            $vendorDirectory = realpath(__DIR__.'/../vendor');
+// the path to TwigBridge library so Twig can locate the
+// form_div_layout.html.twig file
+            $appVariableReflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
+            $vendorTwigBridgeDirectory = dirname($appVariableReflection->getFileName());
+// the path to your other templates
+            $viewsDirectory = realpath(__DIR__.'/../views');
+
+
+            $formEngine = new TwigRendererEngine([$defaultFormTheme], $this->twig);
+            $this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
+                FormRenderer::class => function () use ($formEngine): FormRenderer {
+                    return new FormRenderer($formEngine);
+                },
             ]));
+
+// ... (see the previous CSRF Protection section for more information)
+
+
+// adds the FormExtension to Twig
+            $this->twig->addExtension(new FormExtension());
+
+            // creates the Translator
+            $translator = new Translator('en');
+// somehow load some translations into it
+            $translator->addLoader('xlf', new XliffFileLoader());
+
+
+            $this->twig->addExtension(new TranslationExtension($translator));
+
         }
+
 
         return $this->twig->render("$name.html.twig", $data);
     }

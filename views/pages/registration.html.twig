@@ -2,7 +2,12 @@
 <body>
 <h1>{{ heading }}</h1>
 <p>{{ content }}</p>
-{{ form(form, {'method': 'POST'}) }}
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+
+<input type="submit">
+{{ form_end(form) }}
 
 </body>
 </html>

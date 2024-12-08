@@ -3,7 +3,7 @@
         'name' => 'vendor_name/online-diary',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '5a9164e9b001ca5e7f6c75f273df62e35dcd3fdb',
+        'reference' => '6788d5c568f06723b18a9be8e6361aa0593583f1',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -666,6 +666,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/validator' => array(
+            'pretty_version' => 'v7.2.0',
+            'version' => '7.2.0.0',
+            'reference' => 'ddad20aa8cf7a45a9d6300e5776b8d252dc3524b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/validator',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'symfony/var-dumper' => array(
             'pretty_version' => 'v7.1.8',
             'version' => '7.1.8.0',
@@ -696,7 +705,7 @@
         'vendor_name/online-diary' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '5a9164e9b001ca5e7f6c75f273df62e35dcd3fdb',
+            'reference' => '6788d5c568f06723b18a9be8e6361aa0593583f1',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
