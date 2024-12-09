@@ -28,7 +28,7 @@ class UserService
         }
     }
 
-    public function addUser(array $data)
+    public function addUser(array $data): array
     {
 
         try {
@@ -41,7 +41,7 @@ class UserService
                     'password' => '?',
                 ])
                 ->setParameter(0, $data['form']['name']) // Позиционные параметры начинаются с 0
-                ->setParameter(1, $data['form']['password']);
+                ->setParameter(1, password_hash($data['form']['password'], PASSWORD_DEFAULT));
 
             // Выполняем запрос и возвращаем результат
             $affectedRows = $queryBuilder->executeStatement();
@@ -63,6 +63,33 @@ class UserService
             ];
         }
 
+    }
+
+    public function checkUser(array $data): bool
+    {
+
+        try {
+        $queryBuilder = $this->database->getBuilder();
+        $queryBuilder
+            ->select('id', 'name', 'password')
+            ->from('users')
+            ->where('name = ?') // Позиционные параметры
+            ->setParameter(0, $data['name'])
+        ;// Индекс для первого параметра
+
+            $stmt = $queryBuilder->executeQuery();
+
+            $user = $stmt->fetchAssociative();
+
+
+            if ($user && password_verify($data['password'], $user['password'])) {
+                return true;
+            }
+
+            return false; // Если пользователь найден, возвращаем true
+        } catch (\Exception $e) {
+            throw new \RuntimeException("Error fetching user: " . $e->getMessage());
+        }
     }
 
 }

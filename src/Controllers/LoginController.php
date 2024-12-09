@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\User\UserService;
 use Kernel\Controller\Controller;
+use Kernel\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Forms;
@@ -19,9 +20,9 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
 
-class RegistrationController extends Controller
+class LoginController extends Controller
 {
-    public function register(Request $request): Response
+    public function index(Request $request): Response
     {
 
         $validator = Validation::createValidator();
@@ -31,7 +32,7 @@ class RegistrationController extends Controller
             ->addExtension(new ValidatorExtension($validator))
             ->getFormFactory();
         $form = $formFactory->createBuilder(FormType::class, null, [
-            'action' => '/registration',
+            'action' => '/login',
             'method' => 'POST',
         ])
             ->setRequestHandler(new HttpFoundationRequestHandler())
@@ -57,31 +58,32 @@ class RegistrationController extends Controller
                     ]),
                 ],
                 ])
-            ->add('submit', SubmitType::class, ['label' => 'Register'])
+            ->add('submit', SubmitType::class, ['label' => 'Login'])
             ->getForm();
 
 
         $form->handleRequest($request);
 
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $data = $form->getData();
-//
-//            // Handle form submission, e.g., save $data to the database
-//            return new Response('Registration successful!');
-//        }
-        return new Response($this->initTwig('pages/registration', [
+        return new Response($this->initTwig('pages/login', [
             'form' => $form->createView(),
-            'heading' => 'Registration',
+            'heading' => 'Login',
         ]));
     }
 
-    public function saveUser()
+    public function login()
     {
-
         # FIXME избежать инстанс сервиса
         $userservice = new UserService($this->getDatabase());
-        $userservice->addUser($this->getRequest()->getPost());
+        $userData = $this->getRequest()->getPost();
+
+        if ($userservice->checkUser($userData['form'])){
+            $session = new Session();
+            $session->setSession("user", $this->getRequest()->getPost());
+            dd($_SESSION);
+        } else {
+            dd('пользователь не найден');
+        }
+
     }
 
-    # TODO авторизация
 }

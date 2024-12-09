@@ -3,6 +3,7 @@ use Symfony\Component\Routing\Route;
 use App\Controllers\HomeController;
 use App\Controllers\AboutController;
 use App\Controllers\RegistrationController;
+use App\Controllers\LoginController;
 
 return [
     [
@@ -15,10 +16,18 @@ return [
     ],
     [
         "name" => "registration",
-        "route" => new Route('/registration', ['_controller' => [RegistrationController::class, 'register']])
+        "route" => new Route('/registration', ['_controller' => [RegistrationController::class, 'register']], [], [], '', [], ['GET'])
     ],
     [
         "name" => "saveUser",
-        "route" => new Route('/save-user', ['_controller' => [RegistrationController::class, 'saveUser']], [], [], '', [], ['POST'])
+        "route" => new Route('/registration', ['_controller' => [RegistrationController::class, 'saveUser']], [], [], '', [], ['POST'])
+    ],
+    [
+        "name" => "login",
+        "route" => new Route('/login', ['_controller' => [LoginController::class, 'index']], [], [], '', [], ['GET'])
+    ],
+    [
+        "name" => "setUser",
+        "route" => new Route('/login', ['_controller' => [LoginController::class, 'login']], [], [], '', [], ['POST'])
     ],
 ];
