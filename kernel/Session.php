@@ -15,6 +15,11 @@ class Session
         return $_SESSION[$key] = $value;
     }
 
+    public function getSession()
+    {
+        return $_SESSION;
+    }
+
     public function destroySession()
     {
         session_destroy();

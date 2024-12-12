@@ -30,4 +30,8 @@ return [
         "name" => "setUser",
         "route" => new Route('/login', ['_controller' => [LoginController::class, 'login']], [], [], '', [], ['POST'])
     ],
+    [
+        "name" => "logout",
+        "route" => new Route('/logout', ['_controller' => [LoginController::class, 'logout']])
+    ],
 ];

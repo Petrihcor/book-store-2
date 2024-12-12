@@ -1,8 +1,10 @@
 <?php
 
 namespace Kernel\Controller;
+use App\User\User;
 use Kernel\Database\Database;
 use Kernel\Http\Request;
+use Kernel\Session;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\FormRenderer;
@@ -23,6 +25,15 @@ abstract  class Controller
     protected FilesystemLoader $loader;
 
     protected Database $database;
+
+    protected Session $session;
+
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            $this->session = new Session();
+        }
+    }
 
 
     public function getRequest(): Request
@@ -49,46 +60,54 @@ abstract  class Controller
         $this->twig = new Environment($this->loader);
     }
 
-    protected function initTwig(string $name, array|null $data = null): string
+    private function getForm()
     {
-        $this->getEnvironment();
-
-
-        if (isset($data['form'])) {
-            // the Twig file that holds all the default markup for rendering forms
+        // the Twig file that holds all the default markup for rendering forms
 // this file comes with TwigBridge
-            $defaultFormTheme = 'form_div_layout.html.twig';
+        $defaultFormTheme = 'form_div_layout.html.twig';
 
-            $vendorDirectory = realpath(__DIR__.'/../vendor');
+        $vendorDirectory = realpath(__DIR__.'/../vendor');
 // the path to TwigBridge library so Twig can locate the
 // form_div_layout.html.twig file
-            $appVariableReflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
-            $vendorTwigBridgeDirectory = dirname($appVariableReflection->getFileName());
+        $appVariableReflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
+        $vendorTwigBridgeDirectory = dirname($appVariableReflection->getFileName());
 // the path to your other templates
-            $viewsDirectory = realpath(__DIR__.'/../views');
+        $viewsDirectory = realpath(__DIR__.'/../views');
 
 
-            $formEngine = new TwigRendererEngine([$defaultFormTheme], $this->twig);
-            $this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
-                FormRenderer::class => function () use ($formEngine): FormRenderer {
-                    return new FormRenderer($formEngine);
-                },
-            ]));
+        $formEngine = new TwigRendererEngine([$defaultFormTheme], $this->twig);
+        $this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            FormRenderer::class => function () use ($formEngine): FormRenderer {
+                return new FormRenderer($formEngine);
+            },
+        ]));
 
 // ... (see the previous CSRF Protection section for more information)
 
 
 // adds the FormExtension to Twig
-            $this->twig->addExtension(new FormExtension());
+        $this->twig->addExtension(new FormExtension());
 
-            // creates the Translator
-            $translator = new Translator('en');
+        // creates the Translator
+        $translator = new Translator('en');
 // somehow load some translations into it
-            $translator->addLoader('xlf', new XliffFileLoader());
+        $translator->addLoader('xlf', new XliffFileLoader());
+        $this->twig->addExtension(new TranslationExtension($translator));
+    }
+
+    protected function initTwig(string $name, array|null $data = null): string
+    {
+        $this->getEnvironment();
+
+        if (isset($this->session->getSession()['user'])) {
+            $user = new User($this->session->getSession()['user']['form']["name"]);
+            $data['user'] = $user;
+        }
 
 
-            $this->twig->addExtension(new TranslationExtension($translator));
 
+        if (isset($data['form'])) {
+            $this->getForm();
         }
 
 

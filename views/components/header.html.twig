@@ -1,0 +1,8 @@
+<header>
+    {% if user %}
+        <p>{{ user.name }}</p>
+            <form method="post" action="/logout">
+                    <button type="submit">Выйти</button>
+            </form>
+    {%  endif %}
+</header>

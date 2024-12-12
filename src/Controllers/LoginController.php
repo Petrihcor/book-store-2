@@ -77,13 +77,22 @@ class LoginController extends Controller
         $userData = $this->getRequest()->getPost();
 
         if ($userservice->checkUser($userData['form'])){
-            $session = new Session();
-            $session->setSession("user", $this->getRequest()->getPost());
-            dd($_SESSION);
+//            $session = new Session();
+            $this->session->setSession("user", $this->getRequest()->getPost());
+            # TODO сделать это через класс/метод
+            header('Location: /home');
+            exit;
         } else {
+            # TODO сделать норм отображение ошибки аутентификации
             dd('пользователь не найден');
         }
+    }
 
+    public function logout()
+    {
+        $this->session->destroySession();
+        header('Location: /home');
+        exit;
     }
 
 }
