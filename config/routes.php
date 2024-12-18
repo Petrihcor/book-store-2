@@ -4,11 +4,12 @@ use App\Controllers\HomeController;
 use App\Controllers\AboutController;
 use App\Controllers\RegistrationController;
 use App\Controllers\LoginController;
+use App\Controllers\CategoryController;
 
 return [
     [
         "name" => "home",
-        "route" => new Route('/home', ['_controller' => [HomeController::class, 'index']])
+        "route" => new Route('/', ['_controller' => [HomeController::class, 'index']])
     ],
     [
         "name" => "about",
@@ -33,5 +34,17 @@ return [
     [
         "name" => "logout",
         "route" => new Route('/logout', ['_controller' => [LoginController::class, 'logout']])
+    ],
+    [
+        "name" => "addController",
+        "route" => new Route('/category/add', ['_controller' => [CategoryController::class, 'addCategory']], [], [], '', [], ['GET'])
+    ],
+    [
+        "name" => "createController",
+        "route" => new Route('/category/add', ['_controller' => [CategoryController::class, 'saveCategory']], [], [], '', [], ['POST'])
+    ],
+    [
+        "name" => "showCategories",
+        "route" => new Route('/categories', ['_controller' => [CategoryController::class, 'showCategories']])
     ],
 ];

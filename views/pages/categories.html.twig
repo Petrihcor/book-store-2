@@ -1,0 +1,7 @@
+{{ include('components/head.html.twig') }}
+<h1>{{ heading }}</h1>
+{% for category in categories %}
+    <p>{{ category.name }}</p>
+{% endfor %}
+</body>
+</html>
