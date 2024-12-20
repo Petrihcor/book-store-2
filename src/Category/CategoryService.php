@@ -3,6 +3,7 @@
 namespace App\Category;
 
 use Kernel\Database\Database;
+use Symfony\Component\HttpFoundation\Request;
 
 class CategoryService
 {
@@ -23,9 +24,11 @@ class CategoryService
             $queryBuilder
                 ->insert('categories')
                 ->values([
-                    'name' => '?', // Используем позиционные параметры
+                    'name' => '?',
+                    'description' => '?',// Используем позиционные параметры
                 ])
                 ->setParameter(0, $data['form']['name'])
+                ->setParameter(1, $data['form']['description'])
             ; // Позиционные параметры начинаются с 0
 
             // Выполняем запрос и возвращаем результат
@@ -54,10 +57,28 @@ class CategoryService
         try {
             $queryBuilder = $this->database->getBuilder();
             $queryBuilder
-                ->select('id', 'name')
+                ->select('id', 'name', 'description')
                 ->from('categories');
             $stmt = $queryBuilder->executeQuery();
             return $stmt->fetchAllAssociative();
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+
+    public function getCategory(int $id)
+    {
+        try {
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->select('id', 'name', 'description')
+                ->from('categories')
+                ->where('id = ?') // Используем именованный параметр
+                ->setParameter(0, $id); // Привязываем значение параметра
+
+            $stmt = $queryBuilder->executeQuery();
+
+            return $stmt->fetchAssociative();
         } catch (\Exception $e) {
             return "Error: " . $e->getMessage();
         }

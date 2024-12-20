@@ -6,8 +6,8 @@ use App\Category\Category;
 use App\Category\CategoryService;
 use Kernel\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -45,6 +45,10 @@ class CategoryController extends Controller
                     ]),
                 ]
             ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Description'
+                ]
+            )
             ->add('submit', SubmitType::class, ['label' => 'Create'])
             ->getForm();
 
@@ -68,9 +72,10 @@ class CategoryController extends Controller
     {
 
         $categoriesData = new CategoryService($this->getDatabase());
+
         $categories = [];
         foreach ($categoriesData->getCategories() as $category) {
-            $categories[] = new Category($category['name']);
+            $categories[] = new Category($category['id'], $category['name'], $category['description']);
         }
         $data = [
             'title' => 'Categories',
@@ -78,5 +83,18 @@ class CategoryController extends Controller
         ];
 
         echo $this->initTwig("pages/categories", $data);
+    }
+
+    public function catPage(Request $request, int $id)
+    {
+
+        $categoryService = new CategoryService($this->getDatabase());
+        $categoryData = $categoryService->getCategory($id);
+        $category = new Category($categoryData['id'],$categoryData['name'],$categoryData['description']);
+        $data = [
+            'category' => $category
+        ];
+
+        echo $this->initTwig("pages/category", $data);
     }
 }

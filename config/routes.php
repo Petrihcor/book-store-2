@@ -47,4 +47,8 @@ return [
         "name" => "showCategories",
         "route" => new Route('/categories', ['_controller' => [CategoryController::class, 'showCategories']])
     ],
+    [
+        "name" => "category_page",
+        "route" => new Route('/category/{id}', ['_controller' => [CategoryController::class, 'catPage']])
+    ],
 ];

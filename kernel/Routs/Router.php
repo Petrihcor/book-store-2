@@ -19,7 +19,7 @@ class Router
 
     public UrlMatcher $urlMatcher;
 
-    public Array $arrayRoutes;
+    public array $arrayRoutes;
 
     public function __construct(
         public string $path
@@ -60,13 +60,13 @@ class Router
             // Ищем маршрут
             $parameters = $this->urlMatcher->match($request->getPathInfo());
             $controller = $parameters['_controller'];
-
+            unset($parameters['_controller'], $parameters['_route']); // Убираем служебные параметры
             // Вызываем контроллер
             if (is_array($controller)) {
                 [$class, $method] = $controller;
                 $instance = new $class();
                 if (method_exists($instance, $method)) {
-                    $response = $instance->$method($request);
+                    $response = $instance->$method($request, ...$parameters);
                 } else {
                     throw new \Exception("Method $method does not exist in $class");
                 }
