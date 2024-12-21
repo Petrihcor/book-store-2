@@ -84,5 +84,39 @@ class CategoryService
         }
     }
 
+    public function updateCategory(array $data): array
+    {
 
+        try {
+            $queryBuilder = $this->database->getBuilder();
+
+            $queryBuilder
+                ->update('categories')
+                ->set('name' , '?')
+                ->set('description', '?')
+                ->where('id = ?')
+                ->setParameter(0, $data['form']['name'])// Привязываем значение параметра
+                ->setParameter(1, $data['form']['description'])
+                ->setParameter(2, $data['form']['id']);
+
+            // Выполняем запрос и возвращаем результат
+            $affectedRows = $queryBuilder->executeStatement();
+
+            return [
+                'success' => true,
+                'message' => "$affectedRows row(s) inserted successfully.",
+            ];
+        } catch (\InvalidArgumentException $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        } catch (\Exception $e) {
+            // Обрабатываем общие исключения
+            return [
+                'success' => false,
+                'error' => "Error: " . $e->getMessage(),
+            ];
+        }
+    }
 }

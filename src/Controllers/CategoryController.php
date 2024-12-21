@@ -6,6 +6,7 @@ use App\Category\Category;
 use App\Category\CategoryService;
 use Kernel\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -96,5 +97,59 @@ class CategoryController extends Controller
         ];
 
         echo $this->initTwig("pages/category", $data);
+    }
+
+    public function editCategory(Request $request, int $id): Response
+    {
+        $categoryService = new CategoryService($this->getDatabase());
+        $categoryData = $categoryService->getCategory($id);
+        $category = new Category($categoryData['id'],$categoryData['name'],$categoryData['description']);
+        $data = [
+            'id' => $category->id,
+            'name' => $category->name,
+            'description' => $category->description
+        ];
+        $validator = Validation::createValidator();
+
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension($validator))
+            ->getFormFactory();
+        $form = $formFactory->createBuilder(FormType::class, $data, [
+            'action' => '/update/category',
+            'method' => 'POST',
+        ])
+            ->setRequestHandler(new HttpFoundationRequestHandler())
+            ->add('name', TextType::class, [
+                'label' => 'Name',
+                'constraints' => [
+                    new NotBlank(['message' => 'Name cannot be blank.']),
+                    new Length([
+                        'min' => 3,
+                        'max' => 50,
+                        'minMessage' => 'Name must be at least 3 characters.',
+                        'maxMessage' => 'Name cannot exceed 50 characters.',
+                    ]),
+                ]
+            ])
+            ->add('description', TextareaType::class, [
+                    'label' => 'Description'
+                ]
+            )
+            ->add('id', HiddenType::class)
+            ->add('submit', SubmitType::class, ['label' => 'Update'])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        return new Response($this->initTwig('pages/admin/addCategory', [
+            'form' => $form->createView(),
+            'heading' => 'Create category',
+        ]));
+    }
+
+    public function updateCategory()
+    {
+        $categoryservice = new CategoryService($this->getDatabase());
+        $categoryservice->updateCategory($this->getRequest()->getPost());
     }
 }

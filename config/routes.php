@@ -51,4 +51,12 @@ return [
         "name" => "category_page",
         "route" => new Route('/category/{id}', ['_controller' => [CategoryController::class, 'catPage']])
     ],
+    [
+        "name" => "category_edit",
+        "route" => new Route('/category/edit/{id}', ['_controller' => [CategoryController::class, 'editCategory']])
+    ],
+    [
+        "name" => "category_update",
+        "route" => new Route('/update/category', ['_controller' => [CategoryController::class, 'updateCategory']], [], [], '', [], ['POST'])
+    ],
 ];
