@@ -113,4 +113,9 @@ abstract  class Controller
 
         return $this->twig->render("$name.html.twig", $data);
     }
+
+    protected function redirect(string $url)
+    {
+        header("Location: $url");
+    }
 }

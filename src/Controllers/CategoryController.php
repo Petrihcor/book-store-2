@@ -67,6 +67,7 @@ class CategoryController extends Controller
         # FIXME избежать инстанс сервиса
         $categoryservice = new CategoryService($this->getDatabase());
         $categoryservice->addCategory($this->getRequest()->getPost());
+        $this->redirect('/categories');
     }
 
     public function showCategories()
@@ -143,7 +144,7 @@ class CategoryController extends Controller
 
         return new Response($this->initTwig('pages/admin/addCategory', [
             'form' => $form->createView(),
-            'heading' => 'Create category',
+            'heading' => 'Edit category',
         ]));
     }
 
@@ -151,5 +152,13 @@ class CategoryController extends Controller
     {
         $categoryservice = new CategoryService($this->getDatabase());
         $categoryservice->updateCategory($this->getRequest()->getPost());
+        $this->redirect("/category/{$this->getRequest()->getPost()['form']['id']}");
+    }
+
+    public function deleteCategory(Request $request, int $id)
+    {
+        $categoryService = new CategoryService($this->getDatabase());
+        $categoryService->deleteCategory($id);
+        $this->redirect("/categories");
     }
 }

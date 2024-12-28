@@ -119,4 +119,21 @@ class CategoryService
             ];
         }
     }
+
+    public function deleteCategory(int $id)
+    {
+        try {
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->delete('categories')
+                ->where('id = ?') // Используем именованный параметр
+                ->setParameter(0, $id); // Привязываем значение параметра
+
+            $stmt = $queryBuilder->executeQuery();
+
+            return $stmt->fetchAssociative();
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
 }

@@ -1,7 +1,19 @@
 {{ include('components/head.html.twig') }}
 <h1>{{ heading }}</h1>
+<a href="/category/add">
+    <p>Создать</p>
+</a>
 {% for category in categories %}
-    <p>{{ category.name }}</p>
+    <hr>
+    <a href="/category/{{ category.id}}">
+        <p>{{ category.name }}</p>
+    </a>
+    <a href="/category/edit/{{ category.id}}">
+        <p>Edit</p>
+    </a>
+    <a href="/category/delete/{{ category.id}}">
+        <p>Delete</p>
+    </a>
 {% endfor %}
 </body>
 </html>

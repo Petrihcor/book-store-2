@@ -40,7 +40,7 @@ return [
         "route" => new Route('/category/add', ['_controller' => [CategoryController::class, 'addCategory']], [], [], '', [], ['GET'])
     ],
     [
-        "name" => "createController",
+        "name" => "category_create",
         "route" => new Route('/category/add', ['_controller' => [CategoryController::class, 'saveCategory']], [], [], '', [], ['POST'])
     ],
     [
@@ -58,5 +58,9 @@ return [
     [
         "name" => "category_update",
         "route" => new Route('/update/category', ['_controller' => [CategoryController::class, 'updateCategory']], [], [], '', [], ['POST'])
+    ],
+    [
+        "name" => "category_delete",
+        "route" => new Route('/category/delete/{id}', ['_controller' => [CategoryController::class, 'deleteCategory']])
     ],
 ];
