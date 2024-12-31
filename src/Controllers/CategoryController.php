@@ -55,7 +55,7 @@ class CategoryController extends Controller
 
         $form->handleRequest($request);
 
-        return new Response($this->initTwig('pages/admin/addCategory', [
+        return new Response($this->initTwig('pages/admin/form', [
             'form' => $form->createView(),
             'heading' => 'Create category',
         ]));
@@ -142,7 +142,7 @@ class CategoryController extends Controller
 
         $form->handleRequest($request);
 
-        return new Response($this->initTwig('pages/admin/addCategory', [
+        return new Response($this->initTwig('pages/admin/form', [
             'form' => $form->createView(),
             'heading' => 'Edit category',
         ]));

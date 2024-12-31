@@ -75,12 +75,10 @@ class LoginController extends Controller
         # FIXME избежать инстанс сервиса
         $userservice = new UserService($this->getDatabase());
         $userData = $this->getRequest()->getPost();
-
         if ($userservice->checkUser($userData['form'])){
-//            $session = new Session();
-            $this->session->setSession("user", $this->getRequest()->getPost());
-            # TODO сделать это через класс/метод
-            header('Location: /home');
+
+            $this->session->setSession("user", $this->getRequest()->getPost()['form']['name']);
+            $this->redirect('Location: /');
             exit;
         } else {
             # TODO сделать норм отображение ошибки аутентификации
@@ -91,7 +89,7 @@ class LoginController extends Controller
     public function logout()
     {
         $this->session->destroySession();
-        header('Location: /home');
+        $this->redirect('Location: /');
         exit;
     }
 

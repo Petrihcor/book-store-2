@@ -5,6 +5,7 @@ use App\Controllers\AboutController;
 use App\Controllers\RegistrationController;
 use App\Controllers\LoginController;
 use App\Controllers\CategoryController;
+use App\Controllers\PostController;
 
 return [
     [
@@ -36,7 +37,7 @@ return [
         "route" => new Route('/logout', ['_controller' => [LoginController::class, 'logout']])
     ],
     [
-        "name" => "addController",
+        "name" => "category_add",
         "route" => new Route('/category/add', ['_controller' => [CategoryController::class, 'addCategory']], [], [], '', [], ['GET'])
     ],
     [
@@ -63,4 +64,13 @@ return [
         "name" => "category_delete",
         "route" => new Route('/category/delete/{id}', ['_controller' => [CategoryController::class, 'deleteCategory']])
     ],
+    [
+        "name" => "post_add",
+        "route" => new Route('/post/add', ['_controller' => [PostController::class, 'addPost']], [], [], '', [], ['GET'])
+    ],
+    [
+        "name" => "post_create",
+        "route" => new Route('/post/add', ['_controller' => [PostController::class, 'savePost']], [], [], '', [], ['POST'])
+    ],
+
 ];

@@ -100,7 +100,8 @@ abstract  class Controller
         $this->getEnvironment();
 
         if (isset($this->session->getSession()['user'])) {
-            $user = new User($this->session->getSession()['user']['form']["name"]);
+
+            $user = new User($this->session->getSession()['user']);
             $data['user'] = $user;
         }
 

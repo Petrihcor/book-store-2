@@ -3,7 +3,7 @@
         'name' => 'vendor_name/online-diary',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '6788d5c568f06723b18a9be8e6361aa0593583f1',
+        'reference' => '8773d150dae518832664738fc16fe314508368d5',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -705,7 +705,7 @@
         'vendor_name/online-diary' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '6788d5c568f06723b18a9be8e6361aa0593583f1',
+            'reference' => '8773d150dae518832664738fc16fe314508368d5',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

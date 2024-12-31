@@ -16,7 +16,7 @@ class HomeController extends Controller
             'heading' => 'Hello, Twig!',
             'content' => 'This is a simple example of Twig integration.',
         ];
-        $users = new UserService($this->getDatabase());
+
         echo $this->initTwig("pages/home", $data);
 
 

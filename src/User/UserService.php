@@ -27,6 +27,21 @@ class UserService
             return "Error: " . $e->getMessage();
         }
     }
+    public function getUser(string $name)
+    {
+        try {
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->select('id', 'name')
+                ->where("name = ?")
+                ->setParameter(0, $name)
+                ->from('users');
+            $stmt = $queryBuilder->executeQuery();
+            return $stmt->fetchAssociative();
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
 
     public function addUser(array $data): array
     {
