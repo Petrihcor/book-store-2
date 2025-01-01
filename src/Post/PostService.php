@@ -54,4 +54,18 @@ class PostService
             ];
         }
     }
+
+    public function getPosts()
+    {
+        try {
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->select('*')
+                ->from('posts');
+            $stmt = $queryBuilder->executeQuery();
+            return $stmt->fetchAllAssociative();
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
 }

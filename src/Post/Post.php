@@ -7,6 +7,7 @@ class Post
 
     public function __construct(
         public int $id,
+        public string $name,
         public string $category,
         public string $user,
         public string $createData,
@@ -49,6 +50,12 @@ class Post
     {
         return $this->content;
     }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
 
 
 }

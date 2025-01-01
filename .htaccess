@@ -1,4 +1,9 @@
 RewriteEngine On
 RewriteBase /
 
-RewriteRule (.*) public/index.php
+# Если запрашиваемый ресурс не существует как файл или директория
+RewriteCond %{REQUEST_FILENAME} !-f
+
+
+# Перенаправляем запрос на public/index.php
+RewriteRule ^ public/index.php [L]

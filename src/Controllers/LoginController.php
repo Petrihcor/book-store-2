@@ -78,7 +78,7 @@ class LoginController extends Controller
         if ($userservice->checkUser($userData['form'])){
 
             $this->session->setSession("user", $this->getRequest()->getPost()['form']['name']);
-            $this->redirect('Location: /');
+            $this->redirect('/');
             exit;
         } else {
             # TODO сделать норм отображение ошибки аутентификации
@@ -89,7 +89,7 @@ class LoginController extends Controller
     public function logout()
     {
         $this->session->destroySession();
-        $this->redirect('Location: /');
+        $this->redirect('/');
         exit;
     }
 

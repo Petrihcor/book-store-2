@@ -117,6 +117,8 @@ abstract  class Controller
 
     protected function redirect(string $url)
     {
+
         header("Location: $url");
+        exit; // Завершаем выполнение, чтобы не было вывода после редиректа
     }
 }
