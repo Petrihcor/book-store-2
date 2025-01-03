@@ -72,5 +72,9 @@ return [
         "name" => "post_create",
         "route" => new Route('/post/add', ['_controller' => [PostController::class, 'savePost']], [], [], '', [], ['POST'])
     ],
+    [
+        "name" => "post_page",
+        "route" => new Route('/post/{id}', ['_controller' => [PostController::class, 'index']])
+    ],
 
 ];

@@ -3,13 +3,12 @@
 namespace App\Controllers;
 
 use App\Category\CategoryService;
+use App\Post\Post;
 use App\Post\PostService;
-use App\User\User;
 use App\User\UserService;
 use Kernel\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -24,6 +23,19 @@ use Symfony\Component\Validator\Validation;
 
 class PostController extends Controller
 {
+    public function index(Request $request, int $id)
+    {
+        $postService = new PostService($this->getDatabase());
+        $postData = $postService->getPost($id);
+
+        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
+
+        $data = [
+            'post' => $post
+        ];
+
+        echo $this->initTwig("pages/post", $data);
+    }
     public function addPost(Request $request): Response
     {
 
@@ -88,5 +100,10 @@ class PostController extends Controller
         $postData['form']['user'] = $userId;
         $postService->addPost($postData);
         $this->redirect('/');
+    }
+
+    public function editPost()
+    {
+        
     }
 }

@@ -68,4 +68,32 @@ class PostService
             return "Error: " . $e->getMessage();
         }
     }
+
+    public function getPost(int $id)
+    {
+        try {
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->select(
+                    'p.id',
+                    'p.name',
+                    'p.content',
+                    'p.create_date',
+                    'p.update_date',
+                    'c.name AS category_name',
+                    'u.name AS user_name'
+                )
+                ->from('posts', 'p') // Указываем алиас для таблицы
+                ->leftJoin('p', 'categories', 'c', 'p.category_id = c.id') // Присоединяем категории
+                ->leftJoin('p', 'users', 'u', 'p.user_id = u.id') // Присоединяем пользователей
+                ->where('p.id = ?') // Условие для ID поста
+                ->setParameter(0, $id); // Привязываем значение параметра
+
+            $stmt = $queryBuilder->executeQuery();
+
+            return $stmt->fetchAssociative();
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
 }
