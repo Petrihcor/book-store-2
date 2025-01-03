@@ -76,5 +76,13 @@ return [
         "name" => "post_page",
         "route" => new Route('/post/{id}', ['_controller' => [PostController::class, 'index']])
     ],
+    [
+        "name" => "post_edit",
+        "route" => new Route('/post/edit/{id}', ['_controller' => [PostController::class, 'editPost']], [], [], '', [], ['GET'])
+    ],
+    [
+        "name" => "post_update",
+        "route" => new Route('/update/post', ['_controller' => [PostController::class, 'updatePost']], [], [], '', [], ['POST'])
+    ],
 
 ];

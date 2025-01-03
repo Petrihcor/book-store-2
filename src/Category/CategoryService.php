@@ -86,7 +86,7 @@ class CategoryService
 
     public function updateCategory(array $data): array
     {
-
+#FIXME: убрать поиск по id через скрытое поле
         try {
             $queryBuilder = $this->database->getBuilder();
 

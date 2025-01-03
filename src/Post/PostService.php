@@ -96,4 +96,43 @@ class PostService
             return "Error: " . $e->getMessage();
         }
     }
+
+    public function updatePost(array $data): array
+    {
+#FIXME: убрать поиск по id через скрытое поле
+        try {
+            $queryBuilder = $this->database->getBuilder();
+
+            $queryBuilder
+                ->update('posts')
+                ->set('name' , '?')
+                ->set('category_id', '?')
+                ->set('content', '?')
+                ->set('update_date', 'NOW()')
+                ->where('id = ?')
+                ->setParameter(0, $data['form']['name'])// Привязываем значение параметра
+                ->setParameter(1, $data['form']['category'])
+                ->setParameter(2, $data['form']['content'])
+                ->setParameter(3, $data['form']['id']);
+
+            // Выполняем запрос и возвращаем результат
+            $affectedRows = $queryBuilder->executeStatement();
+
+            return [
+                'success' => true,
+                'message' => "$affectedRows row(s) inserted successfully.",
+            ];
+        } catch (\InvalidArgumentException $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        } catch (\Exception $e) {
+            // Обрабатываем общие исключения
+            return [
+                'success' => false,
+                'error' => "Error: " . $e->getMessage(),
+            ];
+        }
+    }
 }
