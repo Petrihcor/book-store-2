@@ -173,4 +173,11 @@ class PostController extends Controller
         $postService->updatePost($this->getRequest()->getPost());
         $this->redirect("/post/{$this->getRequest()->getPost()['form']['id']}");
     }
+
+    public function deletePost(Request $request, int $id)
+    {
+        $postService = new PostService($this->getDatabase());
+        $postService->deletePost($id);
+        $this->redirect("/");
+    }
 }

@@ -135,4 +135,21 @@ class PostService
             ];
         }
     }
+
+    public function deletePost(int $id)
+    {
+        try {
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->delete('posts')
+                ->where('id = ?') // Используем именованный параметр
+                ->setParameter(0, $id); // Привязываем значение параметра
+
+            $stmt = $queryBuilder->executeQuery();
+
+            return $stmt->fetchAssociative();
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
 }

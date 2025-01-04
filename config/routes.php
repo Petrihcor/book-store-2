@@ -84,5 +84,9 @@ return [
         "name" => "post_update",
         "route" => new Route('/update/post', ['_controller' => [PostController::class, 'updatePost']], [], [], '', [], ['POST'])
     ],
+    [
+        "name" => "post_delete",
+        "route" => new Route('/delete/post/{id}', ['_controller' => [PostController::class, 'deletePost']])
+    ],
 
 ];
