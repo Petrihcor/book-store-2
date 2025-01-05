@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Category\CategoryService;
+use App\Middlewares\LoginMiddleware;
 use App\Post\Post;
 use App\Post\PostService;
 use App\User\UserService;
@@ -39,7 +40,7 @@ class PostController extends Controller
     }
     public function addPost(Request $request): Response
     {
-
+        LoginMiddleware::checkLogin();
         $categoriesData = new CategoryService($this->getDatabase());
 
         $categories = [];
@@ -115,56 +116,62 @@ class PostController extends Controller
         $postService = new PostService($this->getDatabase());
         $postData = $postService->getPost($id);
         $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
+        if ($this->session->getSession()['user'] == $postData['user_name']) {
+            $data = [
+                'id' => $post->id,
+                'name' => $post->name,
+                'category' => $post->category,
+                'content' => $post->content
+            ];
 
-        $data = [
-            'id' => $post->id,
-            'name' => $post->name,
-            'category' => $post->category,
-            'content' => $post->content
-        ];
+            $validator = Validation::createValidator();
 
-        $validator = Validation::createValidator();
-
-        $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory();
-        $form = $formFactory->createBuilder(FormType::class, $data, [
-            'action' => '/update/post',
-            'method' => 'POST',
-        ])
-            ->setRequestHandler(new HttpFoundationRequestHandler())
-            ->add('name', TextType::class, [
-                'label' => 'Name',
-                'constraints' => [
-                    new NotBlank(['message' => 'Name cannot be blank.']),
-                    new Length([
-                        'min' => 3,
-                        'max' => 50,
-                        'minMessage' => 'Name must be at least 3 characters.',
-                        'maxMessage' => 'Name cannot exceed 50 characters.',
-                    ]),
-                ]
+            $formFactory = Forms::createFormFactoryBuilder()
+                ->addExtension(new ValidatorExtension($validator))
+                ->getFormFactory();
+            $form = $formFactory->createBuilder(FormType::class, $data, [
+                'action' => '/update/post',
+                'method' => 'POST',
             ])
-            ->add('category', ChoiceType::class, [
+                ->setRequestHandler(new HttpFoundationRequestHandler())
+                ->add('name', TextType::class, [
+                    'label' => 'Name',
+                    'constraints' => [
+                        new NotBlank(['message' => 'Name cannot be blank.']),
+                        new Length([
+                            'min' => 3,
+                            'max' => 50,
+                            'minMessage' => 'Name must be at least 3 characters.',
+                            'maxMessage' => 'Name cannot exceed 50 characters.',
+                        ]),
+                    ]
+                ])
+                ->add('category', ChoiceType::class, [
                     'label' => 'Category',
                     'choices' => $categories, // Список категорий
                     'constraints' => [
                         new NotBlank(['message' => 'Please select a category.']),
                     ],
-            ])
-            ->add('content', TextareaType::class, [
+                ])
+                ->add('content', TextareaType::class, [
                     'label' => 'Content'
                 ])
-            ->add('id', HiddenType::class)
-            ->add('submit', SubmitType::class, ['label' => 'Update'])
-            ->getForm();
+                ->add('id', HiddenType::class)
+                ->add('submit', SubmitType::class, ['label' => 'Update'])
+                ->getForm();
 
-        $form->handleRequest($request);
+            $form->handleRequest($request);
 
-        return new Response($this->initTwig('pages/admin/form', [
-            'form' => $form->createView(),
-            'heading' => 'Edit post',
-        ]));
+            return new Response($this->initTwig('pages/admin/form', [
+                'form' => $form->createView(),
+                'heading' => 'Edit post',
+            ]));
+        } else {
+            return new Response($this->initTwig('pages/error', [
+                'error' => 'Вы не автор поста',
+                'description' => "Редактирование разрешено только автору поста",
+            ]));
+        }
     }
 
     public function updatePost()
@@ -176,8 +183,17 @@ class PostController extends Controller
 
     public function deletePost(Request $request, int $id)
     {
+
         $postService = new PostService($this->getDatabase());
-        $postService->deletePost($id);
-        $this->redirect("/");
+        $postData = $postService->getPost($id);
+        if ($this->session->getSession()['user'] == $postData['user_name']) {
+            $postService->deletePost($id);
+            $this->redirect("/");
+        } else {
+            return new Response($this->initTwig('pages/error', [
+                'error' => 'Вы не автор поста',
+                'description' => "Удалить пост может только его автор",
+            ]));
+        }
     }
 }

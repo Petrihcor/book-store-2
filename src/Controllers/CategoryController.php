@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Category\Category;
 use App\Category\CategoryService;
+use App\Middlewares\LoginMiddleware;
 use Kernel\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -24,6 +25,7 @@ class CategoryController extends Controller
     public function addCategory(Request $request): Response
     {
 
+        LoginMiddleware::checkLogin();
         $validator = Validation::createValidator();
 
         $formFactory = Forms::createFormFactoryBuilder()

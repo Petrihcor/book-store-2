@@ -3,28 +3,28 @@
 namespace App\Controllers;
 
 
+use App\Middlewares\LoginMiddleware;
 use App\User\UserService;
 use Kernel\Controller\Controller;
-use Kernel\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
 
 class LoginController extends Controller
 {
     public function index(Request $request): Response
     {
-
+        LoginMiddleware::checkLogout();
         $validator = Validation::createValidator();
 
 // Создаем фабрику форм с подключением валидатора
@@ -72,12 +72,14 @@ class LoginController extends Controller
 
     public function login()
     {
+
         # FIXME избежать инстанс сервиса
         $userservice = new UserService($this->getDatabase());
-        $userData = $this->getRequest()->getPost();
-        if ($userservice->checkUser($userData['form'])){
-
-            $this->session->setSession("user", $this->getRequest()->getPost()['form']['name']);
+        $loginData = $this->getRequest()->getPost();
+        if ($userservice->checkUser($loginData['form'])){
+            $userData = $userservice->getUser($this->getRequest()->getPost()['form']['name']);
+            $this->session->setSession("user", $userData['name']);
+            $this->session->setSession("userId", $userData['id']);
             $this->redirect('/');
             exit;
         } else {

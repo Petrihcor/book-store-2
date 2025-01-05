@@ -81,7 +81,7 @@ class RegistrationController extends Controller
         # FIXME избежать инстанс сервиса
         $userservice = new UserService($this->getDatabase());
         $userservice->addUser($this->getRequest()->getPost());
+        $this->redirect('/');
     }
 
-    # TODO авторизация
 }

@@ -101,7 +101,7 @@ abstract  class Controller
 
         if (isset($this->session->getSession()['user'])) {
 
-            $user = new User($this->session->getSession()['user']);
+            $user = new User($this->session->getSession()['userId'], $this->session->getSession()['user']);
             $data['user'] = $user;
         }
 
