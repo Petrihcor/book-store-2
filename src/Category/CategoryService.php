@@ -25,10 +25,12 @@ class CategoryService
                 ->insert('categories')
                 ->values([
                     'name' => '?',
-                    'description' => '?',// Используем позиционные параметры
+                    'description' => '?',
+                    'user_id' => '?'// Используем позиционные параметры
                 ])
                 ->setParameter(0, $data['form']['name'])
                 ->setParameter(1, $data['form']['description'])
+                ->setParameter(2, $data['form']['user'])
             ; // Позиционные параметры начинаются с 0
 
             // Выполняем запрос и возвращаем результат
@@ -57,7 +59,7 @@ class CategoryService
         try {
             $queryBuilder = $this->database->getBuilder();
             $queryBuilder
-                ->select('id', 'name', 'description')
+                ->select('*')
                 ->from('categories');
             $stmt = $queryBuilder->executeQuery();
             return $stmt->fetchAllAssociative();
@@ -71,9 +73,17 @@ class CategoryService
         try {
             $queryBuilder = $this->database->getBuilder();
             $queryBuilder
-                ->select('id', 'name', 'description')
-                ->from('categories')
-                ->where('id = ?') // Используем именованный параметр
+                ->select(
+                    'c.id',
+                    'c.name',
+                    'c.description',
+                    'u.name AS user_name',
+                    'c.create_date',
+                    'c.update_date',
+                )
+                ->from('categories', 'c')
+                ->leftJoin('c', 'users', 'u', 'c.user_id = u.id')
+                ->where('c.id = ?') // Используем именованный параметр
                 ->setParameter(0, $id); // Привязываем значение параметра
 
             $stmt = $queryBuilder->executeQuery();
@@ -94,6 +104,7 @@ class CategoryService
                 ->update('categories')
                 ->set('name' , '?')
                 ->set('description', '?')
+                ->set('update_date', 'NOW()')
                 ->where('id = ?')
                 ->setParameter(0, $data['form']['name'])// Привязываем значение параметра
                 ->setParameter(1, $data['form']['description'])

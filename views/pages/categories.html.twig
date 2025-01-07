@@ -8,12 +8,14 @@
     <a href="/category/{{ category.id}}">
         <p>{{ category.name }}</p>
     </a>
+    {% if user.id == category.user %}
     <a href="/category/edit/{{ category.id}}">
         <p>Edit</p>
     </a>
     <a href="/category/delete/{{ category.id}}">
         <p>Delete</p>
     </a>
+    {% endif %}
 {% endfor %}
 </body>
 </html>
