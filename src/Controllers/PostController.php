@@ -29,6 +29,12 @@ class PostController extends Controller
     {
         $postService = new PostService($this->getDatabase());
         $postData = $postService->getPost($id);
+        if (!$postData) {
+            return new Response($this->initTwig('pages/error', [
+                'error' => 'Такого поста не существует',
+                'description' => "",
+            ]));
+        };
 
         $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
 
@@ -44,7 +50,7 @@ class PostController extends Controller
         $categoriesData = new CategoryService($this->getDatabase());
 
         $categories = [];
-        foreach ($categoriesData->getCategories() as $category) {
+        foreach ($categoriesData->getCategories()['categories'] as $category) {
             $categories[$category['name']] = $category['id'];
         }
 
@@ -106,16 +112,24 @@ class PostController extends Controller
 
     public function editPost(Request $request, int $id)
     {
+        $postService = new PostService($this->getDatabase());
+        $postData = $postService->getPost($id);
+        if (!$postData) {
+            return new Response($this->initTwig('pages/error', [
+                'error' => 'Такого поста не существует',
+                'description' => "",
+            ]));
+        };
+        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
+
         $categoriesData = new CategoryService($this->getDatabase());
 
         $categories = [];
-        foreach ($categoriesData->getCategories() as $category) {
+        foreach ($categoriesData->getCategories()['categories'] as $category) {
             $categories[$category['name']] = $category['id'];
         }
 
-        $postService = new PostService($this->getDatabase());
-        $postData = $postService->getPost($id);
-        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
+
         if ($this->session->getSession()['user'] == $postData['user_name']) {
             $data = [
                 'id' => $post->id,
@@ -191,7 +205,7 @@ class PostController extends Controller
             $this->redirect("/");
         } else {
             return new Response($this->initTwig('pages/error', [
-                'error' => 'Вы не автор поста',
+                'error' => 'Вы не автор поста или поста не существует',
                 'description' => "Удалить пост может только его автор",
             ]));
         }

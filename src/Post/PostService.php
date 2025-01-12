@@ -55,17 +55,34 @@ class PostService
         }
     }
 
-    public function getPosts()
+    public function getPosts(int $page, int $itemsPerPage): array
     {
         try {
             $queryBuilder = $this->database->getBuilder();
+
+            $offset = ($page - 1) * $itemsPerPage;
+
             $queryBuilder
                 ->select('*')
-                ->from('posts');
+                ->from('posts')
+                ->setFirstResult($offset)
+                ->setMaxResults($itemsPerPage)
+            ;
             $stmt = $queryBuilder->executeQuery();
-            return $stmt->fetchAllAssociative();
+            $posts = $stmt->fetchAllAssociative();
+
+            $countQueryBuilder = $this->database->getBuilder();
+            $countQueryBuilder
+                ->select('COUNT(*) as total')
+                ->from('posts');
+
+            $totalPosts = $countQueryBuilder->executeQuery()->fetchOne();
+            return [
+                'posts' => $posts,
+                'total' => (int)$totalPosts,
+            ];
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            throw new \Exception("Ошибка при получении постов: " . $e->getMessage());
         }
     }
 

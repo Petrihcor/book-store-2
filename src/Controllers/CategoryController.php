@@ -78,18 +78,25 @@ class CategoryController extends Controller
         $this->redirect('/categories');
     }
 
-    public function showCategories()
+    public function showCategories(Request $request)
     {
 
-        $categoriesData = new CategoryService($this->getDatabase());
+        $categoriesService = new CategoryService($this->getDatabase());
+        $page = (int)($request->query->get('page', 1)); // Текущая страница
+        $itemsPerPage = 1; // Количество элементов на странице
 
+        $categoriesData = $categoriesService->getCategories($page, $itemsPerPage);
         $categories = [];
-        foreach ($categoriesData->getCategories() as $category) {
+        foreach ($categoriesData['categories'] as $category) {
             $categories[] = new Category($category['id'], $category['name'], $category['user_id'], $category['description'], $category['create_date'], $category['update_date']);
         }
+        $totalPosts = $categoriesData['total'];
+        $totalPages = (int)ceil($totalPosts / $itemsPerPage);
         $data = [
             'title' => 'Categories',
-            'categories' => $categories
+            'categories' => $categories,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
         ];
 
         echo $this->initTwig("pages/categories", $data);
@@ -100,6 +107,12 @@ class CategoryController extends Controller
 
         $categoryService = new CategoryService($this->getDatabase());
         $categoryData = $categoryService->getCategory($id);
+        if (!$categoryData) {
+            return new Response($this->initTwig('pages/error', [
+                'error' => 'Такой категории не существует',
+                'description' => "",
+            ]));
+        };
         $category = new Category($categoryData['id'], $categoryData['name'], $categoryData['user_name'], $categoryData['description'], $categoryData['create_date'], $categoryData['update_date']);
 
         $data = [
@@ -111,8 +124,15 @@ class CategoryController extends Controller
 
     public function editCategory(Request $request, int $id): Response
     {
+
         $categoryService = new CategoryService($this->getDatabase());
         $categoryData = $categoryService->getCategory($id);
+        if (!$categoryData) {
+            return new Response($this->initTwig('pages/error', [
+                'error' => 'Такой категории не существует',
+                'description' => "",
+            ]));
+        };
         $category = new Category($categoryData['id'],$categoryData['name'], $categoryData['user_name'], $categoryData['description'], $categoryData['create_date'], $categoryData['update_date']);
 
         if ($this->session->getSession()['user'] == $categoryData['user_name']) {

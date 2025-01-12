@@ -17,5 +17,40 @@
     </a>
     {% endif %}
 {% endfor %}
+{% if totalPages > 1 %}
+    <nav aria-label="Pagination">
+        <hr class="my-0" />
+        <ul class="pagination justify-content-center my-4">
+            <!-- Кнопка "Назад" -->
+            {% if currentPage > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ currentPage - 1 }}">← Назад</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">← Назад</span>
+                </li>
+            {% endif %}
+
+            <!-- Ссылки на страницы -->
+            {% for i in 1..totalPages %}
+                <li class="page-item {% if i == currentPage %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+            {% endfor %}
+
+            <!-- Кнопка "Вперед" -->
+            {% if currentPage < totalPages %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ currentPage + 1 }}">Вперед →</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Вперед →</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
 </body>
 </html>

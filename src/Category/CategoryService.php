@@ -54,15 +54,33 @@ class CategoryService
         }
     }
 
-    public function getCategories()
+    public function getCategories(?int $page = null, ?int $itemsPerPage = null)
     {
         try {
             $queryBuilder = $this->database->getBuilder();
+            if ($page !== null && $itemsPerPage !== null) {
+                $offset = ($page - 1) * $itemsPerPage;
+                $queryBuilder
+                    ->setFirstResult($offset)
+                    ->setMaxResults($itemsPerPage);
+            }
+
             $queryBuilder
                 ->select('*')
                 ->from('categories');
             $stmt = $queryBuilder->executeQuery();
-            return $stmt->fetchAllAssociative();
+            $categories = $stmt->fetchAllAssociative();
+
+            $countQueryBuilder = $this->database->getBuilder();
+            $countQueryBuilder
+                ->select('COUNT(*) as total')
+                ->from('categories');
+            $totalCategories = $countQueryBuilder->executeQuery()->fetchOne();
+            return [
+                'categories' => $categories,
+                'total' =>(int)$totalCategories
+            ];
+
         } catch (\Exception $e) {
             return "Error: " . $e->getMessage();
         }
@@ -143,8 +161,12 @@ class CategoryService
             $stmt = $queryBuilder->executeQuery();
 
             return $stmt->fetchAssociative();
+        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
+            // Если нарушение внешнего ключа, выбрасываем понятное исключение
+            throw new \Exception("Невозможно удалить категорию, так как с ней связаны посты.");
         } catch (\Exception $e) {
-            return "Error: " . $e->getMessage();
+            // Обрабатываем другие ошибки
+            throw new \Exception("Ошибка при удалении категории: " . $e->getMessage());
         }
     }
 }
