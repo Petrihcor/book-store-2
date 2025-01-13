@@ -169,4 +169,41 @@ class PostService
             return "Error: " . $e->getMessage();
         }
     }
+
+    public function postSearch(int $page, int $itemsPerPage, ?string $search = null)
+    {
+        if ($search) {
+            $offset = ($page - 1) * $itemsPerPage;
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->select('*')
+                ->from('posts');
+            if (!empty($search)) {
+                $queryBuilder->where('name LIKE :search OR content LIKE :search');
+                $queryBuilder->setParameter('search', '%' . $search . '%');
+            }
+
+            $queryBuilder
+                ->setFirstResult($offset)
+                ->setMaxResults($itemsPerPage);
+
+            $stmt = $queryBuilder->executeQuery();
+            $posts = $stmt->fetchAllAssociative();
+
+            $countQueryBuilder = $this->database->getBuilder();
+            $countQueryBuilder->select('COUNT(*) as total')->from('posts');
+
+            if (!empty($search)) {
+                $countQueryBuilder->where('name LIKE :search OR content LIKE :search');
+                $countQueryBuilder->setParameter('search', '%' . $search . '%');
+            }
+            $totalPosts = $countQueryBuilder->executeQuery()->fetchOne();
+            return [
+                'posts' => $posts,
+                'total' => (int)$totalPosts,
+            ];
+        } else {
+            return false;
+        }
+    }
 }

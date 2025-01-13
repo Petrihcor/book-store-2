@@ -169,4 +169,41 @@ class CategoryService
             throw new \Exception("Ошибка при удалении категории: " . $e->getMessage());
         }
     }
+
+    public function categorySearch(int $page, int $itemsPerPage, ?string $search = null)
+    {
+        if ($search) {
+            $offset = ($page - 1) * $itemsPerPage;
+            $queryBuilder = $this->database->getBuilder();
+            $queryBuilder
+                ->select('*')
+                ->from('categories');
+            if (!empty($search)) {
+                $queryBuilder->where('name LIKE :search');
+                $queryBuilder->setParameter('search', '%' . $search . '%');
+            }
+
+            $queryBuilder
+                ->setFirstResult($offset)
+                ->setMaxResults($itemsPerPage);
+
+            $stmt = $queryBuilder->executeQuery();
+            $categories = $stmt->fetchAllAssociative();
+
+            $countQueryBuilder = $this->database->getBuilder();
+            $countQueryBuilder->select('COUNT(*) as total')->from('categories');
+
+            if (!empty($search)) {
+                $countQueryBuilder->where('name LIKE :search');
+                $countQueryBuilder->setParameter('search', '%' . $search . '%');
+            }
+            $totalCategories = $countQueryBuilder->executeQuery()->fetchOne();
+            return [
+                'categories' => $categories,
+                'total' => (int)$totalCategories,
+            ];
+        } else {
+            return false;
+        }
+    }
 }

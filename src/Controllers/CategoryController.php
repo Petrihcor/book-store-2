@@ -83,7 +83,7 @@ class CategoryController extends Controller
 
         $categoriesService = new CategoryService($this->getDatabase());
         $page = (int)($request->query->get('page', 1)); // Текущая страница
-        $itemsPerPage = 1; // Количество элементов на странице
+        $itemsPerPage = 5; // Количество элементов на странице
 
         $categoriesData = $categoriesService->getCategories($page, $itemsPerPage);
         $categories = [];
@@ -197,5 +197,36 @@ class CategoryController extends Controller
         $categoryService = new CategoryService($this->getDatabase());
         $categoryService->deleteCategory($id);
         $this->redirect("/categories");
+    }
+
+    public function search(Request $request)
+    {
+        $page = (int)($request->query->get('page', 1)); // Текущая страница
+        $itemsPerPage = 4;
+        # FIXME избежать инстанс сервиса
+        $categoryService = new CategoryService($this->getDatabase());
+        $categoriesData = $categoryService->categorySearch($page, $itemsPerPage, $this->getRequest()->get()['search']);
+        if ($categoriesData == false) {
+            return new Response($this->initTwig("pages/categories", [
+                'title' => 'Search Page',
+            ]));
+        }
+        $categories = [];
+
+
+        foreach ($categoriesData['categories'] as $categoryData) {
+
+            $categories[] = new Category($categoryData['id'], $categoryData['name'], $categoryData['user_id'], $categoryData['description'], $categoryData['create_date'], $categoryData['update_date']);
+        }
+
+        $totalCategories = $categoriesData['total'];
+        $totalCategories = (int)ceil($totalCategories / $itemsPerPage);
+
+        return new Response($this->initTwig("pages/categories", [
+            'title' => 'Search Page',
+            'categories' => $categories,
+            'currentPage' => $page,
+            'totalСategories' => $totalCategories,
+        ]));
     }
 }

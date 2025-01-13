@@ -65,6 +65,10 @@ return [
         "route" => new Route('/category/delete/{id}', ['_controller' => [CategoryController::class, 'deleteCategory']])
     ],
     [
+        "name" => "category_search",
+        "route" => new Route('/categories/search', ['_controller' => [CategoryController::class, 'search']])
+    ],
+    [
         "name" => "post_add",
         "route" => new Route('/post/add', ['_controller' => [PostController::class, 'addPost']], [], [], '', [], ['GET'])
     ],
@@ -87,6 +91,10 @@ return [
     [
         "name" => "post_delete",
         "route" => new Route('/delete/post/{id}', ['_controller' => [PostController::class, 'deletePost']])
+    ],
+    [
+        "name" => "post_search",
+        "route" => new Route('/posts/search', ['_controller' => [PostController::class, 'search']], [], [])
     ],
 
 ];

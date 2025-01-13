@@ -112,6 +112,7 @@ class PostController extends Controller
 
     public function editPost(Request $request, int $id)
     {
+        # FIXME избежать инстанс сервиса
         $postService = new PostService($this->getDatabase());
         $postData = $postService->getPost($id);
         if (!$postData) {
@@ -190,6 +191,7 @@ class PostController extends Controller
 
     public function updatePost()
     {
+        # FIXME избежать инстанс сервиса
         $postService = new PostService($this->getDatabase());
         $postService->updatePost($this->getRequest()->getPost());
         $this->redirect("/post/{$this->getRequest()->getPost()['form']['id']}");
@@ -203,11 +205,42 @@ class PostController extends Controller
         if ($this->session->getSession()['user'] == $postData['user_name']) {
             $postService->deletePost($id);
             $this->redirect("/");
+            exit();
         } else {
             return new Response($this->initTwig('pages/error', [
                 'error' => 'Вы не автор поста или поста не существует',
                 'description' => "Удалить пост может только его автор",
             ]));
         }
+    }
+
+    public function search(Request $request)
+    {
+
+        $page = (int)($request->query->get('page', 1)); // Текущая страница
+        $itemsPerPage = 4;
+        # FIXME избежать инстанс сервиса
+        $postService = new PostService($this->getDatabase());
+        $postsData = $postService->postSearch($page, $itemsPerPage, $this->getRequest()->get()['search']);
+        if ($postsData == false) {
+            return new Response($this->initTwig("pages/home", [
+                'title' => 'Search Page',
+            ]));
+        }
+        $posts = [];
+
+        foreach ($postsData['posts'] as $postData) {
+            $posts[] = new Post($postData['id'], $postData['name'], $postData['category_id'], $postData['user_id'], $postData['create_date'], $postData['update_date'], $postData['content']);
+        }
+
+        $totalPosts = $postsData['total'];
+        $totalPages = (int)ceil($totalPosts / $itemsPerPage);
+
+        return new Response($this->initTwig("pages/home", [
+            'title' => 'Search Page',
+            'posts' => $posts,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+        ]));
     }
 }

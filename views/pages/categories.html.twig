@@ -1,56 +1,85 @@
 {{ include('components/head.html.twig') }}
 <h1>{{ heading }}</h1>
-<a href="/category/add">
-    <p>Создать</p>
-</a>
-{% for category in categories %}
-    <hr>
-    <a href="/category/{{ category.id}}">
-        <p>{{ category.name }}</p>
-    </a>
-    {% if user.id == category.user %}
-    <a href="/category/edit/{{ category.id}}">
-        <p>Edit</p>
-    </a>
-    <a href="/category/delete/{{ category.id}}">
-        <p>Delete</p>
-    </a>
-    {% endif %}
-{% endfor %}
-{% if totalPages > 1 %}
-    <nav aria-label="Pagination">
-        <hr class="my-0" />
-        <ul class="pagination justify-content-center my-4">
-            <!-- Кнопка "Назад" -->
-            {% if currentPage > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ currentPage - 1 }}">← Назад</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">← Назад</span>
-                </li>
-            {% endif %}
 
-            <!-- Ссылки на страницы -->
-            {% for i in 1..totalPages %}
-                <li class="page-item {% if i == currentPage %}active{% endif %}">
-                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                </li>
+<div class="container">
+    <div class="row">
+        <!-- Blog entries-->
+        <div class="col-lg-8">
+            <a href="/category/add">
+                <p>Создать</p>
+            </a>
+            {% for category in categories %}
+                <hr>
+                <a href="/category/{{ category.id}}">
+                    <p>{{ category.name }}</p>
+                </a>
+                {% if user.id == category.user %}
+                <a href="/category/edit/{{ category.id}}">
+                    <p>Edit</p>
+                </a>
+                <a href="/category/delete/{{ category.id}}">
+                    <p>Delete</p>
+                </a>
+                {% endif %}
             {% endfor %}
+            {% if totalPages > 1 %}
+                <nav aria-label="Pagination">
+                    <hr class="my-0" />
+                    <ul class="pagination justify-content-center my-4">
+                        <!-- Кнопка "Назад" -->
+                        {% if currentPage > 1 %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ currentPage - 1 }}">← Назад</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">← Назад</span>
+                            </li>
+                        {% endif %}
 
-            <!-- Кнопка "Вперед" -->
-            {% if currentPage < totalPages %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ currentPage + 1 }}">Вперед →</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <span class="page-link">Вперед →</span>
-                </li>
+                        <!-- Ссылки на страницы -->
+                        {% for i in 1..totalPages %}
+                            <li class="page-item {% if i == currentPage %}active{% endif %}">
+                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+
+                        <!-- Кнопка "Вперед" -->
+                        {% if currentPage < totalPages %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ currentPage + 1 }}">Вперед →</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Вперед →</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             {% endif %}
-        </ul>
-    </nav>
-{% endif %}
+        </div>
+        <div class="col-lg-4">
+            <!-- Search widget-->
+            <div class="card mb-4">
+                <div class="card-header">Search</div>
+                <div class="card-body">
+                    <form class="input-group" method="get" action="/categories/search">
+                        <input class="form-control" type="search" name="search" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                        <input class="btn btn-primary" id="button-search" type="submit" value="Go!">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer-->
+<footer class="py-5 bg-dark">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"></script>
 </body>
 </html>
