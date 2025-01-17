@@ -8,7 +8,9 @@ use App\Post\Post;
 use App\Post\PostService;
 use App\User\UserService;
 use Kernel\Controller\Controller;
+use Kernel\Upload\Uploader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -19,6 +21,7 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validation;
@@ -38,11 +41,12 @@ class PostController extends Controller
 
         $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
 
-        $data = [
-            'post' => $post
-        ];
 
-        echo $this->initTwig("pages/post", $data);
+        return new Response(
+            $this->initTwig("pages/post", [
+                'post' => $post
+            ])
+        );
     }
     public function addPost(Request $request): Response
     {
@@ -83,6 +87,20 @@ class PostController extends Controller
                     new NotBlank(['message' => 'Please select a category.']),
                 ],
             ])
+            ->add('image', FileType::class, [
+                'label' =>  'Изображение',
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                        ],
+                        'mimeTypesMessage' => 'Пожалуйста, загрузите изображение в формате JPEG, PNG или GIF.',
+                    ])
+                ],
+            ])
             ->add('content', TextareaType::class, [
                 'label' => 'Content'
             ])
@@ -105,6 +123,14 @@ class PostController extends Controller
         $userService = new UserService($this->getDatabase());
         $userId = $userService->getUser($this->session->getSession()['user'])['id'];
         $postData = $this->getRequest()->getPost();
+        if ($this->getRequest()->getFiles()['form']['name']['image']) {
+
+            $uploader = new Uploader(__DIR__ . '/../../public/uploads');
+            $uploader->upload($this->getRequest()->getFiles()['form']);
+
+            $postData['form']['image'] = $this->getRequest()->getFiles()['form']['name']['image'];
+        }
+
         $postData['form']['user'] = $userId;
         $postService->addPost($postData);
         $this->redirect('/');

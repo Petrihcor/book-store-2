@@ -6,6 +6,7 @@ class Request
 {
     private array $post;
     private array $get;
+    private array $files;
 
     public function getPost(): array
     {
@@ -18,6 +19,15 @@ class Request
         $this->get = $_GET;
         return $this->get;
     }
+
+
+    public function getFiles(): array
+    {
+        $this->files = $_FILES;
+        return $this->files;
+    }
+
+
 
 
 }

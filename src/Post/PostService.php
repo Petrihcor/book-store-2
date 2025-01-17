@@ -26,12 +26,14 @@ class PostService
                     'name' => '?',
                     'category_id' => '?',
                     'user_id' => '?',
+                    'image' => '?',
                     'content' => '?',
                 ])
                 ->setParameter(0, $data['form']['name'])
                 ->setParameter(1, $data['form']['category'])
                 ->setParameter(2, $data['form']['user'])
-                ->setParameter(3, $data['form']['content'])
+                ->setParameter(3, $data['form']['image'])
+                ->setParameter(4, $data['form']['content'])
             ; // Позиционные параметры начинаются с 0
 
             // Выполняем запрос и возвращаем результат
