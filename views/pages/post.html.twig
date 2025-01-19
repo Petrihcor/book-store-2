@@ -1,5 +1,8 @@
 {{ include('components/head.html.twig') }}
 <h1>{{ post.name }}</h1>
+{% if post.image %}
+<img class="card-img-top" width="500px" src="/public/uploads/{{ post.image }}" alt="{{ post.name }}" />
+{% endif %}
 <p>{{ post.user }}</p>
 <p>{{ post.category }}</p>
 <p>{{ post.content }}</p>

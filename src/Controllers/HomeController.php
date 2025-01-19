@@ -22,7 +22,7 @@ class HomeController extends Controller
         $posts = [];
 
         foreach ($postsData['posts'] as $postData) {
-            $posts[] = new Post($postData['id'], $postData['name'], $postData['category_id'], $postData['user_id'], $postData['create_date'], $postData['update_date'], $postData['content']);
+            $posts[] = new Post($postData['id'], $postData['name'], $postData['category_id'], $postData['user_id'], $postData['image'], $postData['create_date'], $postData['update_date'], $postData['content']);
         }
         $totalPosts = $postsData['total'];
         $totalPages = (int)ceil($totalPosts / $itemsPerPage);

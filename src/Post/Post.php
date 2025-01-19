@@ -10,6 +10,7 @@ class Post
         public string $name,
         public string $category,
         public string $user,
+        public string|null $image,
         public string $createData,
         public string $updateData,
         public string $content

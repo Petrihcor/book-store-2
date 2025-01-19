@@ -97,6 +97,7 @@ class PostService
                     'p.id',
                     'p.name',
                     'p.content',
+                    'p.image',
                     'p.create_date',
                     'p.update_date',
                     'c.name AS category_name',
@@ -128,11 +129,29 @@ class PostService
                 ->set('category_id', '?')
                 ->set('content', '?')
                 ->set('update_date', 'NOW()')
-                ->where('id = ?')
                 ->setParameter(0, $data['form']['name'])// Привязываем значение параметра
                 ->setParameter(1, $data['form']['category'])
                 ->setParameter(2, $data['form']['content'])
-                ->setParameter(3, $data['form']['id']);
+            ;
+            $parameterIndex = 3; // Индекс для последующих параметров
+
+            // Добавляем условие для обновления изображения, если оно есть
+            if (!empty($data['form']['delete_image'])) {
+                // Если флажок "удалить изображение" отмечен, очищаем поле image
+                $queryBuilder->set('image', 'NULL');
+            } elseif (!empty($data['form']['image'])) {
+                // Если передано новое изображение, обновляем поле image
+                $queryBuilder
+                    ->set('image', '?')
+                    ->setParameter($parameterIndex++, $data['form']['image']);
+            }
+
+            // Указываем условие WHERE в конце
+            $queryBuilder
+                ->where('id = ?')
+                ->setParameter($parameterIndex, $data['form']['id']);
+
+            $queryBuilder->where('id = ?');
 
             // Выполняем запрос и возвращаем результат
             $affectedRows = $queryBuilder->executeStatement();

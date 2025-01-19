@@ -9,6 +9,7 @@ use App\Post\PostService;
 use App\User\UserService;
 use Kernel\Controller\Controller;
 use Kernel\Upload\Uploader;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -39,7 +40,7 @@ class PostController extends Controller
             ]));
         };
 
-        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
+        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['image'], $postData['create_date'], $postData['update_date'], $postData['content']);
 
 
         return new Response(
@@ -126,9 +127,8 @@ class PostController extends Controller
         if ($this->getRequest()->getFiles()['form']['name']['image']) {
 
             $uploader = new Uploader(__DIR__ . '/../../public/uploads');
-            $uploader->upload($this->getRequest()->getFiles()['form']);
 
-            $postData['form']['image'] = $this->getRequest()->getFiles()['form']['name']['image'];
+            $postData['form']['image'] = $uploader->upload($this->getRequest()->getFiles()['form']);
         }
 
         $postData['form']['user'] = $userId;
@@ -147,7 +147,7 @@ class PostController extends Controller
                 'description' => "",
             ]));
         };
-        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['create_date'], $postData['update_date'], $postData['content']);
+        $post = new Post($postData['id'], $postData['name'], $postData['category_name'], $postData['user_name'], $postData['image'], $postData['create_date'], $postData['update_date'], $postData['content']);
 
         $categoriesData = new CategoryService($this->getDatabase());
 
@@ -194,6 +194,24 @@ class PostController extends Controller
                         new NotBlank(['message' => 'Please select a category.']),
                     ],
                 ])
+                ->add('image', FileType::class, [
+                    'label' =>  'Изображение',
+                    'required' => false,
+                    'constraints' => [
+                        new File([
+                            'mimeTypes' => [
+                                'image/jpeg',
+                                'image/png',
+                                'image/gif',
+                            ],
+                            'mimeTypesMessage' => 'Пожалуйста, загрузите изображение в формате JPEG, PNG или GIF.',
+                        ])
+                    ],
+                ])
+                ->add('delete_image', CheckboxType::class, [
+                    'label' => 'Удалить изображение',
+                    'required' => false,
+                ])
                 ->add('content', TextareaType::class, [
                     'label' => 'Content'
                 ])
@@ -219,7 +237,15 @@ class PostController extends Controller
     {
         # FIXME избежать инстанс сервиса
         $postService = new PostService($this->getDatabase());
-        $postService->updatePost($this->getRequest()->getPost());
+        $postData = $this->getRequest()->getPost();
+
+        if ($this->getRequest()->getFiles()['form']['name']['image']) {
+
+            $uploader = new Uploader(__DIR__ . '/../../public/uploads');
+
+            $postData['form']['image'] = $uploader->upload($this->getRequest()->getFiles()['form']);
+        }
+        $postService->updatePost($postData);
         $this->redirect("/post/{$this->getRequest()->getPost()['form']['id']}");
     }
 
@@ -256,7 +282,7 @@ class PostController extends Controller
         $posts = [];
 
         foreach ($postsData['posts'] as $postData) {
-            $posts[] = new Post($postData['id'], $postData['name'], $postData['category_id'], $postData['user_id'], $postData['create_date'], $postData['update_date'], $postData['content']);
+            $posts[] = new Post($postData['id'], $postData['name'], $postData['category_id'], $postData['user_id'], $postData['image'], $postData['create_date'], $postData['update_date'], $postData['content']);
         }
 
         $totalPosts = $postsData['total'];
